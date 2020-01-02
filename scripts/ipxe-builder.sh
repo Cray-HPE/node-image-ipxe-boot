@@ -3,8 +3,8 @@
 # Script to run on a GCE VM Instance to create an iPXE Boot Disk image
 # for use in making Virtual Shasta Network Booted Nodes
 
-project_id="vshasta-cray"
-zone="us-central1-a"
+project_id=$(curl -s http://metadata.google.internal/computeMetadata/v1/project/project-id -H "Metadata-Flavor: Google")
+zone=$(curl -s http://metadata.google.internal/computeMetadata/v1/instance/zone -H "Metadata-Flavor: Google" | sed 's:.*/::')
 
 echo "Installing required packages"
 sudo apt-get install -y --quiet git make gcc liblzma-dev > install.out 2>&1
