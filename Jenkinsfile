@@ -28,7 +28,13 @@ pipeline {
         withCredentials([file(credentialsId: 'google-cloud-image-builder', variable: 'google_cloud_builder_key_file')]) {
           sh "cp \$google_cloud_builder_key_file ./key.json"
           sh "docker exec ${containerNamePrefix}-${uuid} gcloud auth activate-service-account --key-file ./key.json"
-          sh "docker exec ${containerNamePrefix}-${uuid} ./build.sh"
+          sh """
+            docker exec \
+              -e NODE_IMAGES_BUILDER_DESTINATION_IMAGE_PROJECT_ID=vshasta-cray \
+              -e NODE_IMAGES_BUILDER_SUBNETWORK=default-network-us-central1 \
+              -e NODE_IMAGES_BUILDER_ZONE=us-central1-a \
+              ${containerNamePrefix}-${uuid} ./build.sh
+          """
         }
         slackSend channel: "#vshasta-ci-alerts", color: '#61CE18', message: "Node image: ${imageName} build success: ${env.BUILD_URL}", tokenCredentialId: "vshasta-ci-alerts-token"
       }
