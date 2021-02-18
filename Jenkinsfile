@@ -16,6 +16,24 @@ pipeline {
       }
     }
 
+    stage('Push to github') {
+      when {
+        allOf {
+          expression { BRANCH_NAME ==~ /.*/ }
+        }
+      }
+      steps {
+        script {
+          pushToGithub(
+                githubRepo: "Cray-HPE/node-image-ipxe-boot",
+                pemSecretId: "githubapp-stash-sync",
+                githubAppId: "91129",
+                githubAppInstallationId: "13313749"
+          )
+        }
+      }
+    }
+
     stage('Unit Tests/Validation') {
       steps {
         sh "echo 'Nothing to test/validate yet'"
